@@ -1,114 +1,126 @@
-import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import React, { useRef, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { visionData } from "../../data/Data";
 import { assets } from "../../assets/assets";
 
+gsap.registerPlugin(ScrollTrigger);
+
 const Vision = () => {
   const containerRef = useRef(null);
-  const isInView = useInView(containerRef, { once: false, margin: "-20%" });
 
-  const leftVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut",
-      },
-    },
-  };
+  useEffect(() => {
+    const sections = gsap.utils.toArray(".horizontal-section");
+    const container = containerRef.current;
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: 50 },
-    visible: (i) => ({
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.6,
-        delay: i * 0.2,
-        ease: "easeOut",
+    // Set container width to hold all sections horizontally
+    gsap.set(container, {
+      width: `${sections.length * 100}%`,
+      display: "flex",
+    });
+
+    // Set each section to take full viewport width
+    gsap.set(".horizontal-section", {
+      width: "100vw",
+      flexShrink: 0,
+    });
+
+    // Create the horizontal scrolling animation
+    let scrollTween = gsap.to(container, {
+      x: () => -((sections.length - 1) * window.innerWidth),
+      ease: "none",
+      scrollTrigger: {
+        trigger: container.parentNode,
+        pin: true,
+        scrub: 1,
+        start: "top top",
+        end: () => "+=" + (container.scrollWidth - window.innerWidth),
+        markers: false, // Set to true for debugging, then false for production
       },
-    }),
-  };
+    });
+
+    // Clean up function
+    return () => {
+      if (scrollTween && scrollTween.scrollTrigger) {
+        scrollTween.scrollTrigger.kill();
+      }
+    };
+  }, []);
 
   return (
-    <>
-      <div
-        ref={containerRef}
-        className="text-white flex flex-col md:flex-row items-start px-6 py-16 sm:px-8 lg:py-32 gap-10 bg-black"
-      >
-        {/* Left-section with animation */}
-        <motion.div
-          className="text-3xl sm:text-4xl lg:text-5xl font-bold flex flex-col gap-2 w-full md:w-1/2"
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={{
-            hidden: {},
-            visible: {
-              transition: {
-                staggerChildren: 0.3,
-              },
-            },
-          }}
+    <div className="w-screen overflow-hidden">
+      <div ref={containerRef} className="h-screen flex">
+        {/* 1st Section */}
+        <div
+          className="horizontal-section flex-shrink-0 w-screen h-screen relative"
+          style={{ width: "100vw", height: "100vh" }}
         >
-          <motion.h1 variants={leftVariants}>PLANT YOUR VISION</motion.h1>
-          <motion.h1 variants={leftVariants}>BEHIND EACH PIXEL</motion.h1>
-        </motion.div>
+          <img
+            src={assets.creativityBg}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-center flex flex-col gap-2 md:gap-4 px-4">
+            <span className="text-lg sm:text-2xl md:text-3xl lg:text-5xl font-bold">
+              디자인은 메세지를 담고
+            </span>
+            <span className="text-lg sm:text-2xl md:text-3xl lg:text-5xl font-bold">
+              마케팅은 고객의
+            </span>
+            <span className="text-lg sm:text-2xl md:text-3xl lg:text-5xl font-bold">
+              마음을 움직입니다
+            </span>
+          </div>
+        </div>
 
-        {/* Right-section with animation */}
-        <motion.div
-          className="w-full md:w-1/2 flex flex-wrap gap-4"
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={{
-            hidden: {},
-            visible: {
-              transition: {
-                staggerChildren: 0.2,
-                delayChildren: 0.5,
-              },
-            },
+        {/* 2nd Section */}
+        <div
+          className="horizontal-section flex-shrink-0 w-screen h-screen flex flex-col md:flex-row items-start gap-6 md:gap-10 px-4 sm:px-8 lg:px-16 py-12 sm:py-16 lg:py-32 relative"
+          style={{
+            width: "100vw",
+            height: "100vh",
+            backgroundImage: `url(${assets.creativityBg})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
           }}
         >
-          {visionData.map((data, i) => (
-            <motion.div
-              className="w-full flex flex-col gap-2 sm:w-[48%] lg:w-[45%] p-4 rounded-xl bg-gray-900"
-              key={data.id}
-              custom={i}
-              variants={itemVariants}
-            >
-              <motion.h1
-                className="font-bold text-lg"
-                whileInView={{
-                  opacity: [0, 1],
-                  x: [-20, 0],
-                }}
-                viewport={{ once: true, margin: "-20%" }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
+          {/* Left: Text */}
+          <div className="flex-1 flex flex-col gap-4 text-white justify-center px-2 sm:px-4">
+            <span className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold">
+              PLANT YOUR VISION
+            </span>
+            <span className="text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold">
+              BEHIND EACH PIXEL
+            </span>
+          </div>
+
+          {/* Right: Cards */}
+          <div className="flex-1 flex flex-wrap gap-4 sm:gap-6 justify-center items-center px-2 sm:px-4">
+            {visionData.map((data) => (
+              <div
+                key={data.id}
+                className="w-full sm:w-[48%] md:w-[45%] lg:w-[40%] p-4 sm:p-6 rounded-xl bg-gray-900 flex flex-col gap-2"
               >
-                {data.title}
-              </motion.h1>
-              <motion.p
-                className="text-sm sm:text-base"
-                dangerouslySetInnerHTML={{ __html: data.desc }}
-                whileInView={{
-                  opacity: [0, 1],
-                }}
-                viewport={{ once: true, margin: "-10%" }}
-                transition={{ duration: 0.5, delay: i * 0.1 + 0.2 }}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
+                <h1 className="font-bold text-base sm:text-lg md:text-xl lg:text-2xl text-white">
+                  {data.title}
+                </h1>
+                <p
+                  className="text-sm sm:text-base md:text-lg text-gray-300"
+                  dangerouslySetInnerHTML={{ __html: data.desc }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-
-      {/* 301 Labs */}
-      <div className="">
-        <img src={assets.labs} alt="" />
-      </div>
-    </>
+    </div>
   );
 };
 
 export default Vision;
+
+{
+  /* 301 Labs */
+}
+// <div className="">
+//   <img src={assets.labs} alt="" />
+// </div>

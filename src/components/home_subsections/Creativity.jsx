@@ -42,25 +42,6 @@ const Creativity = () => {
           />
         </div>
       </div>
-
-      {/* Img */}
-      <div className="relative w-full">
-        <img
-          src={assets.creativityBg}
-          className="w-full h-[300px] md:h-[500px] lg:h-[600px] object-cover"
-        />
-        <div className="absolute top-1/2 left-1/2 text-white transform -translate-x-1/2 -translate-y-1/2 text-center flex flex-col gap-2 md:gap-4">
-          <span className="text-lg sm:text-2xl md:text-3xl lg:text-5xl font-bold">
-            디자인은 메세지를 담고
-          </span>
-          <span className="text-lg sm:text-2xl md:text-3xl lg:text-5xl font-bold">
-            마케팅은 고객의
-          </span>
-          <span className="text-lg sm:text-2xl md:text-3xl lg:text-5xl font-bold">
-            마음을 움직입니다
-          </span>
-        </div>
-      </div>
     </>
   );
 };
